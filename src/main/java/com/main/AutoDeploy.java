@@ -45,7 +45,7 @@ public class AutoDeploy {
         File[] files=new File(sourceURL).listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                if(name.indexOf(FILTER_PREFIX)>-1)
+                if(name.endsWith(FILTER_PREFIX))
                     return true;
                 return false;
             }
