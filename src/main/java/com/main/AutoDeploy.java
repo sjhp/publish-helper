@@ -23,9 +23,9 @@ public class AutoDeploy {
     //文件格式
     private static String FILTER_PREFIX=".txt";
     //过滤卖家路径的标志
-    private static String SELLER="seller";
+    private static String SELLER="gooday-seller-1.0";
     //过滤卖家路径的标志
-    private static String BUYER="buyer";
+    private static String BUYER="gooday-buyer-1.0";
     //txt文件包含文件计数
     private Map<String,Integer> txtCount;
     //打包的文件计数
@@ -63,14 +63,14 @@ public class AutoDeploy {
                     if(lineTxt.trim().equals(""))
                         continue;
                     logger.debug("准备处理文件：{}中的{}", txt.getName(), lineTxt);
-                    String fileTemp=lineTxt;
+                    String fileTemp=lineTxt.replace("\\",File.separator);
                     //组装绝对路径
-                    if(lineTxt.toLowerCase().indexOf(SELLER)>-1){
-                        fileTemp=sellerURL.endsWith(File.separator)?sellerURL:(sellerURL+File.separator)+lineTxt;
-                    }else if(lineTxt.toLowerCase().indexOf(BUYER)>-1){
-                        fileTemp=buyerURL.endsWith(File.separator)?buyerURL:(buyerURL+File.separator)+lineTxt;
+                    if(fileTemp.toLowerCase().indexOf(SELLER)>-1){
+                        fileTemp=sellerURL.endsWith(File.separator)?sellerURL:(sellerURL+File.separator)+fileTemp.substring(fileTemp.toLowerCase().indexOf(SELLER));
+                    }else if(fileTemp.toLowerCase().indexOf(BUYER)>-1){
+                        fileTemp=buyerURL.endsWith(File.separator)?buyerURL:(buyerURL+File.separator)+fileTemp.substring(fileTemp.toLowerCase().indexOf(BUYER));
                     }else {
-                        logger.error("{}中的[{}]路径错误！",txt.getName(),lineTxt);
+                        logger.error("{}中的[{}]路径错误！",txt.getName(),fileTemp);
                         System.exit(0);
                     }
                     logger.debug("要提取的文件路径：{}",fileTemp);
@@ -115,6 +115,9 @@ public class AutoDeploy {
         if(!source.isDirectory()|| !source.exists()) {
             flag=false;
             logger.error("源路径错误！请检查：{}",sourceURL);
+        }
+        if(des.exists()) {
+            des.delete();
         }
         if(!des.exists() && !des.mkdirs()){
             logger.error("无权创建目标路径！请检查：{}",desURL);
@@ -200,7 +203,7 @@ public class AutoDeploy {
             }
             os  = new FileOutputStream(desFile);
             //开始拷贝
-            IOUtils.copy(is, os);
+            logger.debug("copy:"+IOUtils.copy(is, os));
         }catch (Exception e){
             logger.error("文件拷贝错误：{}", e.getMessage());
         }finally {
